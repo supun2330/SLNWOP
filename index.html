@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>W&OP Document Portal</title>
+    <!-- Use Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for sleek icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Particle background container -->
+    <div class="background-elements">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
+    </div>
+
+    <!-- Login View -->
+    <div id="login-view" class="glass-panel active-panel">
+        <div class="panel-inner">
+            <div class="logo-container">
+                <i class="fa-solid fa-anchor anchor-icon"></i>
+            </div>
+            
+            <h2 class="title">W&OP Login</h2>
+            <p class="subtitle">Secure Document Portal</p>
+            
+            <div class="form-container">
+                <div class="input-group">
+                    <i class="fa-solid fa-user input-icon"></i>
+                    <input type="text" id="username" placeholder="Username" autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-lock input-icon"></i>
+                    <input type="password" id="password" placeholder="Password">
+                </div>
+                
+                <button onclick="attemptLogin()" class="btn primary-btn">
+                    <span>Sign In</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+                <div id="login-error" class="error-msg"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard View -->
+    <div id="dashboard-view" class="glass-panel wide-panel hidden-panel">
+        <div class="dashboard-header">
+            <div class="header-brand">
+                <div class="small-logo">
+                     <i class="fa-solid fa-anchor"></i>
+                </div>
+                <div>
+                    <h2>W&OP Dashboard</h2>
+                    <p class="subtitle" style="margin-bottom: 0;">Welcome back, <span id="user-display" class="highlight-text"></span></p>
+                </div>
+            </div>
+            <button class="btn icon-btn logout-btn" onclick="logout()" title="Logout">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="action-cards">
+                <div class="card" onclick="showDownloadModal()">
+                    <div class="card-icon download-theme">
+                        <i class="fa-solid fa-cloud-arrow-down"></i>
+                    </div>
+                    <div class="card-text">
+                        <h3>Download Documents</h3>
+                        <p>Access and download securely stored files</p>
+                    </div>
+                    <div class="card-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+                </div>
+                
+                <div class="card" onclick="showUploadAuthModal()">
+                    <div class="card-icon upload-theme">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <div class="card-text">
+                        <h3>Upload Documents</h3>
+                        <p>Store new documents securely (Requires PIN)</p>
+                    </div>
+                    <div class="card-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Authentication Modal -->
+    <div id="upload-auth-modal" class="modal-overlay hidden-panel">
+        <div class="glass-panel modal-panel">
+            <button class="close-btn" onclick="closeModal('upload-auth-modal')">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <div class="modal-header-centered">
+                <div class="modal-icon warning-theme"><i class="fa-solid fa-shield-halved"></i></div>
+                <h3>Security Check</h3>
+                <p>Please enter the upload passphrase to continue.</p>
+            </div>
+            
+            <div class="form-container">
+                <div class="input-group">
+                    <i class="fa-solid fa-key input-icon"></i>
+                    <input type="password" id="upload-password" placeholder="Upload Password">
+                </div>
+                
+                <button class="btn warning-btn" onclick="verifyUploadAuth()">
+                    Authorize Upload
+                </button>
+                <div id="upload-auth-error" class="error-msg"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload File Modal -->
+    <div id="upload-file-modal" class="modal-overlay hidden-panel">
+        <div class="glass-panel modal-panel large-modal">
+            <button class="close-btn" onclick="closeModal('upload-file-modal')">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-file-arrow-up" style="margin-right: 10px; color: #3b82f6;"></i> Upload New Document</h3>
+                <p class="subtitle">Supported formats: PDF, Word (.doc, .docx), Excel (.xls, .xlsx)</p>
+            </div>
+            
+            <div class="upload-area" id="drop-zone">
+                <i class="fa-solid fa-file-circle-plus upload-area-icon"></i>
+                <p>Click below or drag a file to upload</p>
+                <input type="file" id="file-input" accept=".pdf,.doc,.docx,.xls,.xlsx" class="file-input-hidden">
+                <label for="file-input" class="btn primary-outline-btn">Select File</label>
+                <div id="selected-file-name" class="selected-file-info"></div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn primary-btn full-width" onclick="handleFileUpload()" id="upload-btn">Confirm Upload</button>
+                <div id="upload-status" class="status-msg"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Download Modal -->
+    <div id="download-modal" class="modal-overlay hidden-panel">
+        <div class="glass-panel modal-panel extra-large-modal">
+            <div class="modal-header flex-header">
+                <div>
+                    <h3><i class="fa-solid fa-folder-open" style="margin-right: 10px; color: #10b981;"></i> Document Library</h3>
+                    <p class="subtitle">Sorted alphabetically (A - Z)</p>
+                </div>
+                <button class="close-btn static-close" onclick="closeModal('download-modal')">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="library-container">
+                <!-- PDFs -->
+                <div class="category-block">
+                    <div class="category-header pdf-header">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        <h4>PDF Documents</h4>
+                        <span class="badge" id="pdf-count">0</span>
+                    </div>
+                    <ul id="pdf-list" class="file-list"></ul>
+                </div>
+                
+                <!-- Word -->
+                <div class="category-block">
+                    <div class="category-header word-header">
+                        <i class="fa-solid fa-file-word"></i>
+                        <h4>Word Documents</h4>
+                        <span class="badge" id="word-count">0</span>
+                    </div>
+                    <ul id="word-list" class="file-list"></ul>
+                </div>
+                
+                <!-- Excel -->
+                <div class="category-block">
+                    <div class="category-header excel-header">
+                        <i class="fa-solid fa-file-excel"></i>
+                        <h4>Excel Spreadsheets</h4>
+                        <span class="badge" id="excel-count">0</span>
+                    </div>
+                    <ul id="excel-list" class="file-list"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
